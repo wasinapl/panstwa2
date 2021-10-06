@@ -16,7 +16,7 @@
         <div class="cat-container">
           <transition-group name="fade">
             <Chip
-              v-for="category in options.categories || []"
+              v-for="category in avalCat || []"
               :key="category._id"
               :label="category.name"
               class="chip noselect p-mr-2 p-mb-2"
@@ -53,7 +53,13 @@
     </div>
     <div class="p-grid p-jc-center">
       <div class="p-col-3 cat-container">
-        <InputText id="link" type="text" class="p-inputtext-sm p-mr-1" modelValue="http://localhost:8080/#/room?id=casnkjd" readonly/>
+        <InputText
+          id="link"
+          type="text"
+          class="p-inputtext-sm p-mr-1"
+          modelValue="http://localhost:8080/#/room?id=casnkjd"
+          readonly
+        />
         <Button
           id="button"
           label="Kopiuj link"
@@ -71,47 +77,54 @@ import Button from "primevue/button";
 import Chip from "./Chip";
 import InputText from "primevue/inputtext";
 import { v4 as uuidv4 } from "uuid";
-import { ref, reactive, inject } from "vue";
+import { ref, reactive, inject, onMounted } from "vue";
 
 export default {
   name: "Settings",
   components: { Slider, Chip, Button, InputText },
   setup() {
     const socket = inject("socket");
-    const newCat = ref("");
-    const addCat = ref(false);
+    const store = inject("store");
     const options = reactive({
       rounds: 5,
       time: 50,
       categories: [],
     });
+    const avalCat = ref([]);
+    const newCat = ref("");
+    const addCat = ref(false);
 
-    socket.emit("getCategories", (res) => {
-      res.forEach((el) => {
-        el.selected = false;
+    onMounted(() => {
+      socket.emit("getCategories", (res) => {
+        res.forEach((el) => {
+          el.selected = false;
+        });
+        avalCat.value = res;
       });
-      options.categories = res;
     });
 
     const selectCat = (id) => {
-      let cat = options.categories.find((el) => el._id == id);
+      let cat = avalCat.value.find((el) => el._id == id);
       cat.selected = !cat.selected;
+      options.categories.push(cat);
     };
 
     const addCatt = () => {
-      options.categories.push({
+      const newCategory = {
         _id: uuidv4(),
         name: newCat.value,
         selected: true,
         custom: true,
-      });
+      };
+      avalCat.value.push(newCategory);
+      options.categories.push(newCategory);
       newCat.value = "";
       addCat.value = false;
     };
 
     const removeCat = (id) => {
-      const index = options.categories.findIndex((el) => el._id == id);
-      options.categories.splice(index, 1);
+      const index = avalCat.value.findIndex((el) => el._id == id);
+      avalCat.value.splice(index, 1);
     };
 
     const copyLink = () => {
@@ -122,11 +135,20 @@ export default {
         var successful = document.execCommand("copy");
         var msg = successful ? "successful" : "unsuccessful";
       } catch (err) {
-        console.log("błąd kopiowania")
+        console.log("błąd kopiowania");
       }
     };
 
-    return { options, selectCat, newCat, addCat, addCatt, removeCat, copyLink };
+    return {
+      options,
+      avalCat,
+      selectCat,
+      newCat,
+      addCat,
+      addCatt,
+      removeCat,
+      copyLink,
+    };
   },
 };
 </script>

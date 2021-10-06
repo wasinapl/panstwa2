@@ -8,7 +8,7 @@
         :key="player.id"
         style="position: relative"
       >
-        <Avatar :image="player.url" class="p-mx-2" size="xlarge" />
+        <Avatar :image="player.avatar" class="p-mx-2" size="xlarge" />
         <h4 class="p-m-1">{{ player.name }}</h4>
         <transition name="fade">
           <i v-if="test" class="pi pi-check ready"></i>
