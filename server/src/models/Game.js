@@ -14,7 +14,14 @@ class Game {
   join(socket, callback) {
     let player = new Player(socket);
     this.players.push(player);
+    socket.to(this.id).emit("newPlayer", this.players);
     callback({ options: this.options, players: this.players });
+  }
+
+  disconnect(socket){
+    let index = this.players.findIndex(el => el.id === socket.id);
+    this.players.splice(index, 1);
+    socket.to(this.id).emit('playerLeft', this.players);
   }
 
   adminCheck(socket) {

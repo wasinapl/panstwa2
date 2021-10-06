@@ -1,8 +1,8 @@
+// @ts-nocheck
 import { reactive, readonly } from "vue";
 
 const state = reactive({
-  name: "",
-  avatar: "",
+  player: {},
   players: [],
   options: {},
   categories: [],
@@ -11,8 +11,8 @@ const state = reactive({
 
 const methods = {
   setUserInfo(name, avatar) {
-    state.name = name;
-    state.avatar = avatar;
+    state.player.name = name;
+    state.player.avatar = avatar;
   },
   setAdmin(isAdmin) {
     state.isAdmin = isAdmin;

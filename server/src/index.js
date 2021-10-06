@@ -15,10 +15,8 @@ io.on("connection", socket => {
   
   console.log(`user connected id=${socket.id}`)
 
-  socket.on("createRoom", (player, callback) => {
+  socket.on("createRoom", callback => {
     let id = nanoid(10);
-    socket.name = player.name;
-    socket.avatar = player.avatar;
     rooms[id] = new Game(id, socket);
     callback(id);
   })
@@ -28,7 +26,11 @@ io.on("connection", socket => {
     else callback({ok: true, admin: rooms[id].adminCheck(socket)})
   })
 
-  socket.on("joinRoom", (id, callback) => {
+  socket.on("joinRoom", ({id, player}, callback) => {
+    socket.name = player.name;
+    socket.avatar = player.avatar;
+    socket.join(id);
+    socket.room = id;
     rooms[id].join(socket, callback);
   })
 
@@ -36,4 +38,8 @@ io.on("connection", socket => {
     const categories = await Category.find({});
     callback(categories);
   });
+
+  socket.on("disconnect", reason => {
+    if(socket.room) rooms[socket.room].disconnect(socket);
+  })
 });

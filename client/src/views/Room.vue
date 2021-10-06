@@ -46,24 +46,31 @@ export default {
           name: "Home",
         });
       else if (res.admin) {
-        socket.emit("joinRoom", route.query.id, (res) => {
-          store.methods.setOptions(res.options);
-          store.methods.setPlayers(res.players);
-          store.methods.setAdmin(res.admin);
-          view.value = "lobby";
-        });
+        join();
       } else {
-        view.value = "nickname"
+        view.value = "nickname";
         store.methods.setAdmin(res.admin);
-      };
+      }
     });
 
+    socket.on("newPlayer", players => {
+      console.log(players)
+      store.methods.setPlayers(players);
+    })
+    socket.on("playerLeft", players => {
+      store.methods.setPlayers(players);
+    })
+
     const join = () => {
-      socket.emit("joinRoom", route.query.id, (res) => {
-        store.methods.setOptions(res.options);
-        store.methods.setPlayers(res.players);
-        view.value = "lobby";
-      });
+      socket.emit(
+        "joinRoom",
+        { id: route.query.id, player: store.state.player },
+        (res) => {
+          store.methods.setOptions(res.options);
+          store.methods.setPlayers(res.players);
+          view.value = "lobby";
+        }
+      );
     };
 
     console.log(route.query.id);

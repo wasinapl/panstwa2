@@ -75,7 +75,6 @@ export default {
       store.methods.setAdmin(true);
       socket.emit(
         "createRoom",
-        { name: name.value, avatar: avatar.value },
         (id) => {
           router.push({
             name: "Room",
@@ -88,7 +87,7 @@ export default {
     };
 
     const joinGame = () => {
-      store.methods.setName(name);
+      store.methods.setUserInfo(name, avatar);
       emit("join");
     };
 
