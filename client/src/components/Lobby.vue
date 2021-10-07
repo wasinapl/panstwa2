@@ -1,6 +1,6 @@
 <template>
-  <div class="p-m-3" style="position: relative; height: 100%">
-    <Settings />
+  <div class="p-d-flex p-flex-column  p-ai-center">
+    <Settings/>
     <PlayerList /><br />
     <Button id="button" label="Gotowy"/>
   </div>
@@ -23,9 +23,4 @@ export default {
 
 <style scoped>
 
-#button {
-  position: absolute;
-  bottom: 5%;
-  right: 45%
-}
 </style>

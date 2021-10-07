@@ -39,6 +39,13 @@ io.on("connection", socket => {
     callback(categories);
   });
 
+  socket.on("optionsChange", options => {
+    socket.to(socket.room).emit("optionsChange", options);
+  })
+  socket.on("avalCatChange", avalCAt => {
+    socket.to(socket.room).emit("avalCatChange", avalCAt);
+  })
+
   socket.on("disconnect", reason => {
     if(socket.room) rooms[socket.room].disconnect(socket);
   })
