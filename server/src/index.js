@@ -39,6 +39,10 @@ io.on("connection", socket => {
     callback(categories);
   });
 
+  socket.on("message", msg => {
+    socket.to(socket.room).emit('message', msg);
+  })
+
   socket.on("optionsChange", options => {
     socket.to(socket.room).emit("optionsChange", options);
   })

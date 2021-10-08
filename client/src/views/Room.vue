@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%; height: 100%">
+  <div style="width: 100%; height: 100%; position: relative;">
     <Lobby v-if="view === 'lobby'" />
     <RandomLetter
       v-if="view === 'random'"
@@ -10,6 +10,7 @@
     <Voting v-if="view === 'voting'" />
     <Table v-if="view === 'table'" />
     <Nickname :newGame="false" @join="join" v-if="view === 'nickname'" />
+    <Chat/>
   </div>
 </template>
 
@@ -22,6 +23,7 @@ import Table from "../components/Table";
 import Nickname from "../components/Nickname";
 import { useRoute, useRouter } from "vue-router";
 import { ref, inject } from "vue";
+import Chat from '../components/Chat.vue';
 
 export default {
   name: "Room",
@@ -32,6 +34,7 @@ export default {
     Voting,
     Table,
     Nickname,
+    Chat
   },
   setup() {
     const route = useRoute();
