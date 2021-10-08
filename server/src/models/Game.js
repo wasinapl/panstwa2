@@ -1,8 +1,9 @@
 import Player from "./Player";
 
 class Game {
-  constructor(id, socket) {
+  constructor(id, socket, io) {
     this.id = id;
+    this.io = io;
     this.admin = socket.id;
     this.options = {};
     this.options.rounds = 5;
@@ -26,6 +27,16 @@ class Game {
 
   adminCheck(socket) {
     return this.admin === socket.id;
+  }
+
+  setReadyStatus(id){
+    const player = this.players.find(p => p.id === id);
+    player.ready = !player.ready;
+    let count = 0;
+    this.players.forEach(pl => {
+      if(pl.ready) count++;
+    })
+    this.io.to(this.id).emit("allReady", count == this.players.length);
   }
 }
 

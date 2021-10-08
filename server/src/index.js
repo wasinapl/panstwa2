@@ -17,7 +17,7 @@ io.on("connection", socket => {
 
   socket.on("createRoom", callback => {
     let id = nanoid(10);
-    rooms[id] = new Game(id, socket);
+    rooms[id] = new Game(id, socket, io);
     callback(id);
   })
 
@@ -41,6 +41,11 @@ io.on("connection", socket => {
 
   socket.on("message", msg => {
     socket.to(socket.room).emit('message', msg);
+  })
+
+  socket.on('playerReady', () => {
+    rooms[socket.room].setReadyStatus(socket.id);
+    io.to(socket.room).emit('playerReady', socket.id);
   })
 
   socket.on("optionsChange", options => {

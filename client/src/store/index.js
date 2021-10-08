@@ -20,6 +20,13 @@ const methods = {
   setPlayers(players) {
     state.players = players;
   },
+  setPlayerId(id){
+    state.player.id = id;
+  },
+  setReadyStatus(playerID){
+    const player = state.players.find(p => p.id === playerID);
+    player.ready = !player.ready;
+  },
   setOptions(options) {
     state.options = options;
   },

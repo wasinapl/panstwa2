@@ -11,7 +11,7 @@
         <Avatar :image="player.avatar" class="p-mx-2" size="xlarge" />
         <h4 class="p-m-1">{{ player.name }}</h4>
         <transition name="fade">
-          <i v-if="test" class="pi pi-check ready"></i>
+          <i v-if="player.ready" class="pi pi-check ready"></i>
         </transition>
       </div>
     </div>
@@ -20,15 +20,20 @@
 
 <script>
 import Avatar from "primevue/avatar";
+import Badge from 'primevue/badge';
 import { ref, inject } from "vue";
 
 export default {
   name: "PlayerList",
-  components: { Avatar },
+  components: { Avatar, Badge },
   setup() {
     const test = ref(false);
     const store = inject('store')
+    const socket = inject('socket')
 
+    socket.on('playerReady', player => {
+      store.methods.setReadyStatus(player);
+    })
 
     return { store, test };
   },
@@ -63,7 +68,7 @@ export default {
 .fade-leave-active {
   transition: opacity 0.3s;
 }
-.fade-enter-from, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.fade-enter-from, .fade-leave-to {
   opacity: 0;
 }
 </style>

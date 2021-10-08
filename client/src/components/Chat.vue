@@ -60,14 +60,6 @@ export default {
     const store = inject("store");
     const socket = inject("socket");
 
-    messages.value.push({
-      avatar:
-        "https://avataaars.io/?accessoriesType=Round&avatarStyle=Circle&clotheColor=Heather&clotheType=ShirtScoopNeck&eyeType=Default&eyebrowType=UpDown&facialHairColor=BlondeGolden&facialHairType=Blank&hairColor=Red&hatColor=PastelYellow&mouthType=Sad&skinColor=Pale&topType=LongHairFrida",
-      nick: "User1",
-      text: "asdasdasdasdasdasdasda asdasd dasd ",
-      me: false,
-    });
-
     socket.on('message', msg => {
         console.log(msg)
         msg.me = false;

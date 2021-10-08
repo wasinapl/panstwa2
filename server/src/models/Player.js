@@ -3,6 +3,7 @@ class Player {
     this.id = socket.id;
     this.name = socket.name;
     this.avatar = socket.avatar;
+    this.ready = false;
   }
 }
 
