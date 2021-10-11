@@ -9,7 +9,7 @@
         @click="rdy"
         :class="{ 'p-button-success': !ready, 'p-button-secondary': ready }"
       />
-      <Button v-if="store.state.isAdmin" label="Start" :disabled="!allReady"  class="p-button-primary"/>
+      <Button v-if="store.state.isAdmin" label="Start" :disabled="!allReady"  class="p-button-primary" @click="start"/>
     </div>
   </div>
 </template>
@@ -38,11 +38,15 @@ export default {
       socket.emit("playerReady");
     };
 
+    const start = () => {
+      socket.emit("startGame", store.state.options);
+    }
+
     socket.on("allReady", (state) => {
       allReady.value = state;
     })
 
-    return { ready, rdy, store, allReady };
+    return { ready, rdy, store, allReady, start };
   },
 };
 </script>

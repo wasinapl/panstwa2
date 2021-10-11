@@ -3,11 +3,22 @@
     <div class="p-grid p-jc-center">
       <div class="p-col-2">
         <h3>Rundy: {{ options.rounds }}</h3>
-        <Slider v-model="options.rounds" :min="1" :max="15" :disabled="!store.state.isAdmin"/>
+        <Slider
+          v-model="options.rounds"
+          :min="1"
+          :max="15"
+          :disabled="!store.state.isAdmin"
+        />
       </div>
       <div class="p-col-2">
         <h3>Czas: {{ options.time }}</h3>
-        <Slider v-model="options.time" :min="10" :step="5" :max="120" :disabled="!store.state.isAdmin"/>
+        <Slider
+          v-model="options.time"
+          :min="10"
+          :step="5"
+          :max="120"
+          :disabled="!store.state.isAdmin"
+        />
       </div>
     </div>
     <div class="p-mb-3">
@@ -102,7 +113,7 @@ export default {
     });
 
     const selectCat = (id) => {
-      if(!store.state.isAdmin) return;
+      if (!store.state.isAdmin) return;
       let cat = avalCat.value.find((el) => el._id == id);
       if (!cat.selected) {
         options.categories.push(cat);
@@ -129,7 +140,7 @@ export default {
     };
 
     const removeCat = (id) => {
-      if(!store.state.isAdmin) return;
+      if (!store.state.isAdmin) return;
       let index = avalCat.value.findIndex((el) => el._id == id);
       avalCat.value.splice(index, 1);
 
@@ -156,21 +167,24 @@ export default {
         options.rounds = opt.rounds;
       });
       socket.on("avalCatChange", (aval) => {
-        avalCat.value = aval
+        avalCat.value = aval;
       });
     }
 
     watch(
       () => options,
       (options, prevOptions) => {
-        if (store.state.isAdmin) socket.emit("optionsChange", options);
+        if (store.state.isAdmin) {
+          socket.emit("optionsChange", options);
+          store.methods.setOptions(options);
+        }
       },
       { deep: true }
     );
 
     const emitCat = () => {
       socket.emit("avalCatChange", avalCat.value);
-    }
+    };
 
     return {
       options,
@@ -181,7 +195,7 @@ export default {
       addCatt,
       removeCat,
       copyLink,
-      store
+      store,
     };
   },
 };

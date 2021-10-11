@@ -13,8 +13,8 @@ import 'primeicons/primeicons.css';
 const app = createApp(App);
 
 app.use(Socketio, {
-    //connection: 'ws://localhost:3000',
-    connection: 'ws://192.168.55.11:3000',
+    connection: 'ws://localhost:3000',
+    //connection: 'ws://192.168.55.11:3000',
     options: {}
 })
 

@@ -3,14 +3,14 @@
     <Lobby v-if="view === 'lobby'" />
     <RandomLetter
       v-if="view === 'random'"
-      :letter="'X'"
+      :letter="letter"
       @done="view = 'writing'"
     />
-    <Writing v-if="view === 'writing'" :letter="'K'" />
+    <Writing v-if="view === 'writing'" :letter="letter" />
     <Voting v-if="view === 'voting'" />
     <Table v-if="view === 'table'" />
     <Nickname :newGame="false" @join="join" v-if="view === 'nickname'" />
-    <Chat/>
+    <Chat />
   </div>
 </template>
 
@@ -23,7 +23,7 @@ import Table from "../components/Table";
 import Nickname from "../components/Nickname";
 import { useRoute, useRouter } from "vue-router";
 import { ref, inject } from "vue";
-import Chat from '../components/Chat.vue';
+import Chat from "../components/Chat.vue";
 
 export default {
   name: "Room",
@@ -34,7 +34,7 @@ export default {
     Voting,
     Table,
     Nickname,
-    Chat
+    Chat,
   },
   setup() {
     const route = useRoute();
@@ -42,6 +42,7 @@ export default {
     const socket = inject("socket");
     const store = inject("store");
     const view = ref("");
+    const letter = ref('');
 
     socket.emit("roomExist", route.query.id, (res) => {
       if (!res.ok)
@@ -56,13 +57,19 @@ export default {
       }
     });
 
-    socket.on("newPlayer", players => {
-      console.log(players)
+    socket.on("newPlayer", (players) => {
+      console.log(players);
       store.methods.setPlayers(players);
-    })
-    socket.on("playerLeft", players => {
+    });
+    socket.on("playerLeft", (players) => {
       store.methods.setPlayers(players);
-    })
+    });
+
+    socket.on("startGame", (res) => {
+      store.methods.setOptions(res.options);
+      letter.value = res.letter;
+      view.value = "random";
+    });
 
     const join = () => {
       socket.emit(
@@ -78,7 +85,7 @@ export default {
 
     console.log(route.query.id);
 
-    return { view, join };
+    return { view, join, letter };
   },
 };
 </script>

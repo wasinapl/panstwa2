@@ -55,6 +55,14 @@ io.on("connection", socket => {
     socket.to(socket.room).emit("avalCatChange", avalCAt);
   })
 
+  socket.on("startGame", options => {
+    rooms[socket.room].startGame(options);
+  })
+
+  socket.on("setStatus", (data) => {
+    socket.to(socket.room).emit('setStatus', data);
+  })
+
   socket.on("disconnect", reason => {
     if(socket.room) rooms[socket.room].disconnect(socket);
   })

@@ -1,16 +1,13 @@
 <template>
-  <div
-    class="p-m-3"
-    style="display: flex; flex-direction: column; height: 100%"
-  >
+  <div class="p-m-3" id="container">
     <div class="p-grid">
       <div class="p-col-fixed" style="width:350px">
-        <Knob class="p-mx-auto" v-model="value" :min="0" :max="60" readonly />
+        <Knob class="p-mx-auto" v-model="time" :min="0" :max="60" readonly />
       </div>
-      <div class="p-col" v-for="player in store.state.players" :key="player.id">
+      <div class="p-col" v-for="player in players" :key="player.id">
         <div class="p-container">
           <div class="player" style="position: relative">
-            <Avatar :image="player.url" class="p-mx-2" size="xlarge" />
+            <Avatar :image="player.avatar" class="p-mx-2" size="xlarge" />
             <h4 class="p-m-1">{{ player.name }}</h4>
           </div>
         </div>
@@ -19,7 +16,7 @@
     <div id="category">
       <div
         class="p-grid"
-        v-for="(category, i) in store.state.categories"
+        v-for="(category, i) in store.state.options.categories"
         :key="category.id"
       >
         <div class="p-col-fixed" style="width:350px">
@@ -33,37 +30,37 @@
                 v-model="words[i]"
                 :placeholder="letter"
                 @keyup="check(i)"
+                @focus="focus(i)"
+                @blur="blur(i)"
               />
             </div>
           </div>
         </div>
         <div
           class="p-col status-container"
-          v-for="player in store.state.players"
+          v-for="player in players"
           :key="player.id"
         >
           <i
-            v-if="false"
-            class="pi pi-check-circle status-done"
-            style="fontSize: 1.8rem"
-          ></i>
-          <i
-            v-if="true"
+            v-if="statuses[category._id][player.id] == 0"
             class="pi pi-circle-off status-empty"
             style="fontSize: 1.8rem"
           ></i>
           <i
-            v-if="false"
+            v-if="statuses[category._id][player.id] == 1"
             class="pi pi-pencil status-write"
+            style="fontSize: 1.8rem"
+          ></i>
+          <i
+            v-if="statuses[category._id][player.id] == 2"
+            class="pi pi-check-circle status-done"
             style="fontSize: 1.8rem"
           ></i>
         </div>
       </div>
-      <div class="p-grid">
-          <div class="p-col">
-              <Button label="Gotowy" style="margin: 0 auto; display: block;"/>
-          </div>
-      </div>
+    </div>
+    <div class="p-d-flex p-jc-center" id="btn-container">
+      <Button label="Gotowy" />
     </div>
   </div>
 </template>
@@ -73,37 +70,82 @@ import Knob from "primevue/knob";
 import Avatar from "primevue/avatar";
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
-import { ref, inject } from "vue";
+import { ref, reactive, inject, computed } from "vue";
 
 export default {
   name: "Writing",
   components: { Knob, Avatar, InputText, Button },
   props: ["letter"],
   setup(props, context) {
-    const value = ref(60);
     const store = inject("store");
+    const socket = inject("socket");
+    const time = ref(store.state.options.time);
     const letter = props.letter;
-    const words = ref([]);
+    const words = ref(
+      new Array(store.state.options.categories.length).fill("")
+    );
+    const statuses = reactive({});
 
-    words.value = new Array(store.state.categories.length).fill("");
+    store.state.options.categories.forEach((category) => {
+      statuses[category._id] = {};
+      store.state.players.forEach((player) => {
+        statuses[category._id][player.id] = 0;
+      });
+    });
 
     const timer = () => {
-      if (value.value > 0) {
-        value.value--;
+      if (time.value > 0) {
+        time.value--;
         setTimeout(timer, 1000);
       }
     };
+
+    const players = computed(() => {
+      let players = [];
+      players.push(...store.state.players);
+      let index = players.findIndex((pl) => pl.id == store.state.player.id);
+      players.splice(index, 1);
+      return players;
+    });
 
     const check = (i) => {
       if (words.value[i].charAt(0).toLowerCase() != props.letter.toLowerCase())
         words.value[i] = "";
     };
 
+    const focus = (i) => {
+      socket.emit("setStatus", {
+        category: store.state.options.categories[i]._id,
+        player: store.state.player.id,
+        status: 1,
+      });
+    };
+
+    const blur = (i) => {
+      socket.emit("setStatus", {
+        category: store.state.options.categories[i]._id,
+        player: store.state.player.id,
+        status: words.value[i].length > 1 ? 2 : 0,
+      });
+    };
+
+    socket.on('setStatus', ({category, player, status}) => {
+      statuses[category][player] = status;
+    })
+
     timer();
 
-    window.onblur = () => console.log('blurred');
-
-    return { value, store, letter, words, check };
+    return {
+      time,
+      store,
+      letter,
+      words,
+      players,
+      statuses,
+      check,
+      focus,
+      blur,
+    };
   },
 };
 </script>
@@ -113,6 +155,12 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .status-done {
@@ -127,8 +175,17 @@ export default {
 
 #category {
   display: flex;
-  flex-grow: 1;
   flex-direction: column;
   justify-content: space-evenly;
+  -webkit-box-flex: 1; /* OLD - iOS 6-, Safari 3.1-6 */
+  -moz-box-flex: 1; /* OLD - Firefox 19- */
+  -webkit-flex: 1; /* Chrome */
+  -ms-flex: 1; /* IE 10 */
+  flex: 1; /* NEW, */
+}
+
+#btn-container {
+  height: 40px;
+  margin-bottom: 20px;
 }
 </style>
