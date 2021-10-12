@@ -1,54 +1,46 @@
 <template>
   <div id="container">
-    <h5>{{ letters[0] }}</h5>
-    <h4>{{ letters[1] }}</h4>
-    <h3>{{ letters[2] }}</h3>
-    <h2>{{ letters[3] }}</h2>
-    <h2>{{ letters[4] }}</h2>
-    <h1>{{ letters[5] }}</h1>
-    <h2>{{ letters[6] }}</h2>
-    <h2>{{ letters[7] }}</h2>
-    <h3>{{ letters[8] }}</h3>
-    <h4>{{ letters[9] }}</h4>
-    <h5>{{ letters[10] }}</h5>
+    <div id="letters-container">
+      <div id="letters" :style="{left: `${left}px`}">
+        <div class="letter p-text-center" v-for="(letter, i) in letters" :key="i">
+          <h1>{{ letter }}</h1>
+        </div>
+      </div>
+    </div>
     <div id="lines"></div>
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 export default {
   name: "RandomLetter",
   props: ["letter"],
-  emits: ['done'],
-  setup(props, {emit}) {
+  emits: ["done"],
+  setup(props, { emit }) {
     const letters = ref([]);
     const alphabet = "abcdefghijklmnoprstuwz".split("");
+    const left = ref(-2500);
     let time = 50;
     let count = 0;
 
-    for (let i = 0; i < 11; i++) {
+    for (let i = 0; i < 30; i++) {
       letters.value.push(
         alphabet[Math.floor(Math.random() * alphabet.length)].toUpperCase()
       );
     }
+    console.log(props.letter)
+    letters.value[4] = props.letter;
 
-    const changeLetter = () => {
-      if (time < 300) setTimeout(changeLetter, time);
-      else setTimeout(() => { emit("done") }, 2000)
-      time *= 1.1;
-      letters.value.shift();
-      if (++count == 15) letters.value.push(props.letter);
-      else
-        letters.value.push(
-          alphabet[Math.floor(Math.random() * alphabet.length)].toUpperCase()
-        );
-    };
+    setTimeout(() => {
+      left.value = 0;
+    }, 200)
+    setTimeout(() => {
+      emit('done');
+    }, 5200)
 
-    changeLetter();
-
-    return { letters };
+    return { letters, left };
   },
 };
 </script>
@@ -60,6 +52,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   position: relative;
 }
 
@@ -72,32 +65,26 @@ export default {
   left: 50% - 85px;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5 {
-  width: 10%;
-  text-align: center;
+#letters-container {
+  height: 100px;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
-h1 {
-  font-size: 8rem;
+#letters {
+  height: 100px;
+  width: 100%;
+  position: absolute;
+  transition: left 5s cubic-bezier(0.215, 0.61, 0.355, 1);
+  white-space: nowrap;
 }
-h2 {
-  font-size: 6rem;
-  opacity: 0.9;
-}
-h3 {
-  font-size: 5rem;
-  opacity: 0.7;
-}
-h4 {
-  font-size: 4rem;
-  opacity: 0.5;
-}
-h5 {
-  font-size: 3rem;
-  opacity: 0.3;
+
+.letter {
+  display: inline-block;
+  width: 11%;
+  height: 100%;
+  border-right: 5px transparent;
+  border-left: 5px transparent;
 }
 </style>
