@@ -7,7 +7,7 @@
       @done="view = 'writing'"
     />
     <Writing v-if="view === 'writing'" :letter="letter" />
-    <Voting v-if="view === 'voting'" />
+    <Voting v-if="view === 'voting'" :words="data.words"/>
     <Table v-if="view === 'table'" />
     <Nickname :newGame="false" @join="join" v-if="view === 'nickname'" />
     <Chat />
@@ -22,7 +22,7 @@ import Voting from "../components/Voting";
 import Table from "../components/Table";
 import Nickname from "../components/Nickname";
 import { useRoute, useRouter } from "vue-router";
-import { ref, inject } from "vue";
+import { ref, reactive, inject } from "vue";
 import Chat from "../components/Chat.vue";
 
 export default {
@@ -43,6 +43,7 @@ export default {
     const store = inject("store");
     const view = ref("");
     const letter = ref('');
+    const data = reactive({words: {}});
 
     socket.emit("roomExist", route.query.id, (res) => {
       if (!res.ok)
@@ -71,6 +72,11 @@ export default {
       view.value = "random";
     });
 
+    socket.on("voting", words => {
+      data.words = words
+      view.value = "voting";
+    })
+
     const join = () => {
       socket.emit(
         "joinRoom",
@@ -85,7 +91,7 @@ export default {
 
     console.log(route.query.id);
 
-    return { view, join, letter };
+    return { view, join, letter, data };
   },
 };
 </script>

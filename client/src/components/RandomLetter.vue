@@ -22,15 +22,12 @@ export default {
     const letters = ref([]);
     const alphabet = "abcdefghijklmnoprstuwz".split("");
     const left = ref(-2500);
-    let time = 50;
-    let count = 0;
 
     for (let i = 0; i < 30; i++) {
       letters.value.push(
         alphabet[Math.floor(Math.random() * alphabet.length)].toUpperCase()
       );
     }
-    console.log(props.letter)
     letters.value[4] = props.letter;
 
     setTimeout(() => {

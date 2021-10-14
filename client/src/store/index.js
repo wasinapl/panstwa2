@@ -36,6 +36,13 @@ const methods = {
   setTime(time) {
     state.options.time = time;
   },
+
+  getCategories(){
+    return state.options.categories;
+  },
+  getCategoriesCount(){
+    return state.options.categories.length;
+  }
 };
 
 // methods.setPlayers([

@@ -29,6 +29,7 @@
                 type="text"
                 v-model="words[i]"
                 :placeholder="letter"
+                :disabled="time < 1"
                 @keyup="check(i)"
                 @focus="focus(i)"
                 @blur="blur(i)"
@@ -60,7 +61,7 @@
       </div>
     </div>
     <div class="p-d-flex p-jc-center" id="btn-container">
-      <Button label="Gotowy" />
+      <Button label="Gotowy" :disabled="time < 1 || readyStatus" @click="ready"/>
     </div>
   </div>
 </template>
@@ -81,6 +82,7 @@ export default {
     const socket = inject("socket");
     const time = ref(store.state.options.time);
     const letter = props.letter;
+    const readyStatus = ref(false);
     const words = ref(
       new Array(store.state.options.categories.length).fill("")
     );
@@ -97,6 +99,9 @@ export default {
       if (time.value > 0) {
         time.value--;
         setTimeout(timer, 1000);
+      }
+      else{
+        socket.emit('words', words.value)
       }
     };
 
@@ -129,8 +134,16 @@ export default {
       });
     };
 
+    const ready = () => {
+      readyStatus.value = true;
+      socket.emit("writingReady");
+    }
+
     socket.on('setStatus', ({category, player, status}) => {
       statuses[category][player] = status;
+    })
+    socket.on('timeChange', () => {
+      time.value = 10;
     })
 
     timer();
@@ -145,6 +158,8 @@ export default {
       check,
       focus,
       blur,
+      ready,
+      readyStatus
     };
   },
 };
@@ -176,7 +191,7 @@ export default {
 #category {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   -webkit-box-flex: 1; /* OLD - iOS 6-, Safari 3.1-6 */
   -moz-box-flex: 1; /* OLD - Firefox 19- */
   -webkit-flex: 1; /* Chrome */

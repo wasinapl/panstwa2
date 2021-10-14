@@ -61,7 +61,6 @@ export default {
     const socket = inject("socket");
 
     socket.on('message', msg => {
-        console.log(msg)
         msg.me = false;
         messages.value.unshift(msg);
     })
@@ -134,6 +133,7 @@ export default {
   background: #292929;
   padding: 8px;
   border-radius: 0px 5px 5px 5px;
+  word-wrap: break-word;
 }
 
 .text.me {

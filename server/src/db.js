@@ -1,5 +1,8 @@
 import mongoose from "mongoose"
+import dotenv from "dotenv"
 
-var conn = mongoose.createConnection('mongodb+srv://wasina:Wrzysztof12@cluster0.zif31.mongodb.net/panstwa?retryWrites=true&w=majority', { useNewUrlParser: true});
+dotenv.config({silent: true})
+
+var conn = mongoose.createConnection(process.env.DB_CONNECT, { useNewUrlParser: true});
 
 export default conn;

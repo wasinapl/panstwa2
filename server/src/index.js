@@ -63,6 +63,19 @@ io.on("connection", socket => {
     socket.to(socket.room).emit('setStatus', data);
   })
 
+  socket.on('writingReady', () => {
+    io.to(socket.room).emit('timeChange');
+  })
+
+  socket.on('words', words => {
+    rooms[socket.room].addWords(words, socket);
+  })
+
+  socket.on('vote', data => {
+    rooms[socket.room].vote(data);
+    io.to(socket.room).emit("vote", data);
+  })
+
   socket.on("disconnect", reason => {
     if(socket.room) rooms[socket.room].disconnect(socket);
   })

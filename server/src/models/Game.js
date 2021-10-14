@@ -53,6 +53,17 @@ class Game {
     this.rounds.push(round);
     this.io.to(this.id).emit("startGame", { options: this.options, letter });
   }
+
+  addWords(words, socket){
+    this.rounds[this.round].addWords(words, socket);
+    if(this.rounds[this.round].playersWordsCount() == this.players.length){
+      this.io.to(this.id).emit('voting', this.rounds[this.round].getWords());
+    }
+  }
+
+  vote(data){
+    this.rounds[this.round].vote(data);
+  }
 }
 
 export default Game;
