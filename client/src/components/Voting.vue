@@ -86,8 +86,9 @@
         </div>
       </div>
     </div>
+    <PlayersList  style="margin-bottom: 20px; margin-top: 20px"/>
     <div class="p-d-flex p-jc-center" id="btn-container">
-      <Button label="Gotowe" :disabled="time < 1 || readyStatus" @click="ready"/>
+      <Button label="Gotowe" :disabled="readyStatus" @click="ready" />
     </div>
   </div>
 </template>
@@ -97,18 +98,20 @@ import Button from "primevue/button";
 import Avatar from "primevue/avatar";
 import InputText from "primevue/inputtext";
 import ProgressBar from "primevue/progressbar";
+import PlayersList from "./Voting/PlayersList.vue";
 
 import { ref, reactive, inject } from "vue";
 
 export default {
   name: "Voting",
-  components: { Button, Avatar, InputText, ProgressBar },
+  components: { Button, Avatar, InputText, ProgressBar, PlayersList },
   props: ["words"],
   setup(props, context) {
     const activeIndex = ref(0);
     const store = inject("store");
     const socket = inject("socket");
     const words = reactive(props.words);
+    const readyStatus = ref(false);
 
     const votes = {};
     Object.keys(props.words).forEach((player) => {
@@ -138,6 +141,11 @@ export default {
       });
     };
 
+    const ready = () => {
+      readyStatus.value = true;
+      socket.emit("voteReady");
+    };
+
     socket.on("vote", ({ player, category, value }) => {
       if (value) {
         words[player][category].rating.good++;
@@ -148,7 +156,16 @@ export default {
       }
     });
 
-    return { activeIndex, store, words, votesState, nextCat, vote };
+    return {
+      activeIndex,
+      store,
+      words,
+      votesState,
+      readyStatus,
+      nextCat,
+      vote,
+      ready,
+    };
   },
 };
 </script>

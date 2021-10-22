@@ -143,7 +143,7 @@ export default {
 
 .slide-chat-enter,
 .slide-chat-leave-to {
-  transform: scale(1, 0) translateY(100%);
+  transform: scale(1, 0) translateY(200%);
   opacity: 0;
 }
 

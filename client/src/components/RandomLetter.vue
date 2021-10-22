@@ -23,7 +23,7 @@ export default {
     const alphabet = "abcdefghijklmnoprstuwz".split("");
     const left = ref(-2500);
 
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 50; i++) {
       letters.value.push(
         alphabet[Math.floor(Math.random() * alphabet.length)].toUpperCase()
       );

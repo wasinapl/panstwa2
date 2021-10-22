@@ -29,7 +29,7 @@
                 type="text"
                 v-model="words[i]"
                 :placeholder="letter"
-                :disabled="time < 1"
+                :disabled="time < 1 || readyStatus"
                 @keyup="check(i)"
                 @focus="focus(i)"
                 @blur="blur(i)"
@@ -61,7 +61,7 @@
       </div>
     </div>
     <div class="p-d-flex p-jc-center" id="btn-container">
-      <Button label="Gotowy" :disabled="time < 1 || readyStatus" @click="ready"/>
+      <Button label="Gotowy" :disabled="time < 1 || blockButton" @click="ready"/>
     </div>
   </div>
 </template>
@@ -83,6 +83,7 @@ export default {
     const time = ref(store.state.options.time);
     const letter = props.letter;
     const readyStatus = ref(false);
+    const blockButton = ref(true);
     const words = ref(
       new Array(store.state.options.categories.length).fill("")
     );
@@ -132,17 +133,32 @@ export default {
         player: store.state.player.id,
         status: words.value[i].length > 1 ? 2 : 0,
       });
+      checkAllWords()
     };
 
     const ready = () => {
       readyStatus.value = true;
+      blockButton.value = true;
       socket.emit("writingReady");
+    }
+
+    const checkAllWords = () => {
+      let allFill = true;
+      for (let i = 0; i < words.value.length; i++) {
+        const word = words.value[i];
+        if(word.length < 2) {
+          allFill = false;
+          break;
+        }
+      }
+      blockButton.value = !allFill;
     }
 
     socket.on('setStatus', ({category, player, status}) => {
       statuses[category][player] = status;
     })
     socket.on('timeChange', () => {
+      blockButton.value = true;
       time.value = 10;
     })
 
@@ -159,7 +175,8 @@ export default {
       focus,
       blur,
       ready,
-      readyStatus
+      readyStatus,
+      blockButton
     };
   },
 };

@@ -23,6 +23,7 @@ io.on("connection", socket => {
 
   socket.on("roomExist", (id, callback) => {
     if(!rooms[id]) callback({ok: false})
+    else if(!rooms[id].isLobby()) callback({ok: false})
     else callback({ok: true, admin: rooms[id].adminCheck(socket)})
   })
 
@@ -74,6 +75,11 @@ io.on("connection", socket => {
   socket.on('vote', data => {
     rooms[socket.room].vote(data);
     io.to(socket.room).emit("vote", data);
+  })
+
+  socket.on('voteReady', () => {
+    io.to(socket.room).emit("voteReady", socket.id);
+    rooms[socket.room].voteReady();
   })
 
   socket.on("disconnect", reason => {

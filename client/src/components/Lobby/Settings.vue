@@ -60,13 +60,13 @@
         />
       </div>
     </div>
-    <div>
+    <div v-if="store.state.isAdmin">
       <div class="cat-container">
         <InputText
           id="link"
           type="text"
           class="p-inputtext-sm p-mr-1"
-          modelValue="http://localhost:8080/#/room?id=casnkjd"
+          :modelValue="link"
           readonly
         />
         <Button
@@ -87,6 +87,7 @@ import Chip from "./Chip";
 import InputText from "primevue/inputtext";
 import { v4 as uuidv4 } from "uuid";
 import { ref, reactive, inject, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
 
 export default {
   name: "Settings",
@@ -94,6 +95,7 @@ export default {
   setup() {
     const socket = inject("socket");
     const store = inject("store");
+    const route = useRoute();
     const options = reactive({
       rounds: 5,
       time: 50,
@@ -102,6 +104,10 @@ export default {
     const avalCat = ref([]);
     const newCat = ref("");
     const addCat = ref(false);
+    const link =
+      process.env.NODE_ENV === "development"
+        ? `http://localhost:8080/#/room?id=${route.query.id}`
+        : `http://panstwamiasta.online/#/room?id=${route.query.id}`;
 
     onMounted(() => {
       socket.emit("getCategories", (res) => {
@@ -188,14 +194,15 @@ export default {
 
     return {
       options,
+      link,
       avalCat,
-      selectCat,
+      store,
       newCat,
       addCat,
+      selectCat,
       addCatt,
       removeCat,
       copyLink,
-      store,
     };
   },
 };

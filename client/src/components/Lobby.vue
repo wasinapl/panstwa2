@@ -9,14 +9,20 @@
         @click="rdy"
         :class="{ 'p-button-success': !ready, 'p-button-secondary': ready }"
       />
-      <Button v-if="store.state.isAdmin" label="Start" :disabled="!allReady"  class="p-button-primary" @click="start"/>
+      <Button
+        v-if="store.state.isAdmin"
+        label="Start"
+        :disabled="!allReady"
+        class="p-button-primary"
+        @click="start"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import Settings from "./Lobby/Settings";
-import PlayerList from "./Lobby/PlayerList";
+import PlayerList from "./Lobby/PlayersList";
 import Button from "primevue/button";
 import { ref, inject } from "vue";
 
@@ -40,11 +46,11 @@ export default {
 
     const start = () => {
       socket.emit("startGame", store.state.options);
-    }
+    };
 
     socket.on("allReady", (state) => {
       allReady.value = state;
-    })
+    });
 
     return { ready, rdy, store, allReady, start };
   },
