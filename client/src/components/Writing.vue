@@ -2,7 +2,7 @@
   <div class="p-m-3" id="container">
     <div class="p-grid">
       <div class="p-col-fixed" style="width:350px">
-        <Knob class="p-mx-auto" v-model="time" :min="0" :max="60" readonly />
+        <Knob class="p-mx-auto" v-model="time" :min="0" :max="store.state.options.time" readonly />
       </div>
       <div class="p-col" v-for="player in players" :key="player.id">
         <div class="p-container">

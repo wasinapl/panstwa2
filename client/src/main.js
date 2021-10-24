@@ -16,7 +16,7 @@ app.use(Socketio, {
   connection:
     process.env.NODE_ENV === "development"
       ? "ws://localhost:3000"
-      : "ws://panstwamiasta.online",
+      : "ws://panstwamiasta.online:3000",
   options: {},
 });
 
